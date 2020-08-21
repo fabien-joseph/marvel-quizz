@@ -8,12 +8,13 @@ const Welcome = (props) => {
     const firebase = useContext(FirebaseContext);
 
     useEffect(() => {
-        let listener = firebase.auth.onAuthStateChanged(user => {
+        const unlisten = firebase.auth.onAuthStateChanged(user => {
+            console.log(user);
             user ? setUserSession(user) : props.history.push('/');
         })
 
         return () => {
-            listener();
+            unlisten();
         }
     }, [firebase.auth, props.history]);
 

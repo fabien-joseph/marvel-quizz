@@ -2,7 +2,7 @@ import React, {useContext, useEffect, useState} from "react";
 import {FirebaseContext} from "../Firebase";
 
 const Logout = () => {
-    const [checked, setChecked] = useState(true);
+    const [checked, setChecked] = useState(false);
     const firebase = useContext(FirebaseContext);
 
     useEffect(() => {
