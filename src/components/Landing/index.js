@@ -6,11 +6,7 @@ const Landing = () => {
     const refWolverine = useRef(null);
 
     useEffect(() => {
-        refWolverine.current.classList.add("startingImg");
-        setTimeout(() => {
-            refWolverine.current.classList.remove("startingImg");
-            setBtn(true);
-        }, 3000);
+        setBtn(true);
     }, [])
 
     const setLeftImg = () => {
