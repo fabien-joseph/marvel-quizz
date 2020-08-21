@@ -38,10 +38,11 @@ const Login = (props) => {
             <div className={"slContainer"}>
                 <div className={"formBoxLeftLogin"}>
                 </div>
+
+
                 <div className={"formBoxRight"}>
                     <div className={"formContent"}>
                         {errorMsg !== '' && <span>{errorMsg}</span>}
-
                         <form onSubmit={handleSubmit}>
                             <h2>Connexion</h2>
 
@@ -62,6 +63,8 @@ const Login = (props) => {
                         </form>
                         <div className={"linkContainer"}>
                             <Link className={"simpleLink"} to={"/signup"}>Nouveau ? Inscrivez-vous</Link>
+                            <br/>
+                            <Link className={"simpleLink"} to={"/forgetpassword"}>Mot de passe oublié ?</Link>
                         </div>
                     </div>
                 </div>
