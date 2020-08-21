@@ -1,6 +1,9 @@
-import React, {useState} from "react";
+import React, {useState, useContext} from "react";
+import {FirebaseContext} from "../Firebase";
 
 const Signup = () => {
+    const firebase = useContext(FirebaseContext);
+
     const data = {
         pseudo: '',
         email: '',
@@ -9,15 +12,32 @@ const Signup = () => {
     }
 
     const [loginData, setLoginData] = useState(data);
+    const [error, setError] = useState('');
 
     const handleChange = e => {
         setLoginData({...loginData, [e.target.id]: e.target.value});
+    }
+
+    const handleSubmit = e => {
+        e.preventDefault();
+        const {email, password} = loginData;
+        firebase.signUpUser(email, password)
+            .then(user => {
+                setLoginData({...data});
+            })
+            .catch(error => {
+                setLoginData({...data});
+                setError(error);
+            });
     }
 
     const {pseudo, email, password, confirmPassword} = loginData;
 
     const btn = pseudo === '' || email === '' || password === '' || password !== confirmPassword ?
         <button disabled={true}>Inscription</button> : <button>Inscription</button>
+
+    // Gestion error
+    const errorMsg = error !== '' && <span>{error.message}</span>
 
     return (
         <div className={"signUpLoginBox"}>
@@ -27,7 +47,8 @@ const Signup = () => {
 
                 <div className={"formBoxRight"}>
                     <div className={"formContent"}>
-                        <form>
+                        <form onSubmit={handleSubmit}>
+                            {errorMsg}
                             <h2>Inscription</h2>
 
                             <div className={"inputBox"}>
