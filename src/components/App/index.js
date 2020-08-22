@@ -11,6 +11,9 @@ import ErrorPage from "../../ErrorPage";
 import ForgetPassword from "../FortgetPassword";
 
 function Index() {
+
+    console.log(process.env)
+
     return (
         <Router>
             <Header/>
