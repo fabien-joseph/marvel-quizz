@@ -7,13 +7,10 @@ import Footer from "../Footer";
 import Welcome from "../Welcome";
 import Login from "../Login";
 import Signup from "../Signup";
-import ErrorPage from "../../ErrorPage";
+import ErrorPage from "../ErrorPage";
 import ForgetPassword from "../FortgetPassword";
 
 function Index() {
-
-    console.log(process.env)
-
     return (
         <Router>
             <Header/>
