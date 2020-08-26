@@ -9,7 +9,7 @@ const ProgressBar = () => {
             </div>
             <div className={"progressBar"}>
                 <div className={"progressBarChange"} style={{
-                    width: '40%'
+                    width: '10%'
                 }} />
             </div>
         </Fragment>
