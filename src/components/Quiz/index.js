@@ -1,19 +1,59 @@
 import React, {Component} from "react";
 import Levels from "../Levels";
 import ProgressBar from "../ProgressBar";
+import {QuizMarvel} from "../quizMarvel";
 
-class Quiz extends Component{
+class Quiz extends Component {
+
+    state = {
+        levelName: ["debutant", "confirme", "expert"],
+        quizLevel: 0,
+        maxQuestions: 10,
+        storedQuestions: [],
+        question: null,
+        options: [],
+        idQuestion: 0,
+    }
+
+    loadQuestions = level => {
+        const fetchedArrayQuizz = QuizMarvel[0].quizz[level];
+        if (fetchedArrayQuizz.length >= this.state.maxQuestions) {
+            const newArray = fetchedArrayQuizz.map(( { answer, ...keepRest})  => keepRest)
+            this.setState({
+                storedQuestions: newArray
+            })
+        } else {
+            console.log("Pas assez de questions");
+        }
+    }
+
+    componentDidMount() {
+        this.loadQuestions(this.state.levelName[this.state.quizLevel]);
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (this.state.storedQuestions !== prevState.storedQuestions) {
+
+            this.setState({
+                question: this.state.storedQuestions[this.state.idQuestion].question,
+                options: this.state.storedQuestions[this.state.idQuestion].options,
+            })
+        }
+    }
 
     render() {
+        const displayOptions = this.state.options.map((option, index) => {
+            return (
+                <p key={index} className={"answerOptions"}>{option}</p>
+            )
+        } )
+
         return (
             <div>
-                <Levels />
-                <ProgressBar />
-                <h2>Notre question Quiz</h2>
-                <p className={"answerOptions"}>Question 1</p>
-                <p className={"answerOptions"}>Question 2</p>
-                <p className={"answerOptions"}>Question 3</p>
-                <p className={"answerOptions"}>Question 4</p>
+                <Levels/>
+                <ProgressBar/>
+                <h2>{this.state.question}</h2>
+                { displayOptions }
                 <button className={"btnSubmit"}>Suivant</button>
             </div>
         )

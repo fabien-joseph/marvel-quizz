@@ -9,19 +9,15 @@ const Welcome = (props) => {
     const [userData, setUserData] = useState({});
 
     useEffect(() => {
-        console.log("Use Effect")
         let listener = firebase.auth.onAuthStateChanged(user => {
             user ? setUserSession(user) : props.history.push('/');
         })
-        console.log(userSession === null ? 'Pas encore de session' : `Session trouvée : ${userSession.uid}`)
         if (!!userSession)
         if (!!userSession) {
             firebase.getUser(userSession.uid)
                 .get()
                 .then((doc) => {
-                    console.log(doc.data())
                     if (doc) {
-                        console.log(doc.data())
                         const myData = doc.data();
                         setUserData(myData)
                     }
