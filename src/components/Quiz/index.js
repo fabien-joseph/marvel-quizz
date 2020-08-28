@@ -1,7 +1,12 @@
-import React, {Component} from "react";
+import React, {Component, Fragment} from "react";
 import Levels from "../Levels";
 import ProgressBar from "../ProgressBar";
 import {QuizMarvel} from "../quizMarvel";
+import {toast} from "react-toastify";
+import 'react-toastify/dist/ReactToastify.min.css'
+import QuizOver from "../QuizOver";
+
+toast.configure();
 
 class Quiz extends Component {
 
@@ -16,16 +21,17 @@ class Quiz extends Component {
         btnDisabled: true,
         userAnswer: null,
         score: 0,
+        quizEnd: false,
     }
 
-    storedDataRed =  React.createRef();
+    storedDataRed = React.createRef();
 
     loadQuestions = level => {
         const fetchedArrayQuizz = QuizMarvel[0].quizz[level];
         if (fetchedArrayQuizz.length >= this.state.maxQuestions) {
             this.storedDataRed.current = fetchedArrayQuizz;
 
-            const newArray = fetchedArrayQuizz.map(( { answer, ...keepRest})  => keepRest)
+            const newArray = fetchedArrayQuizz.map(({answer, ...keepRest}) => keepRest)
             this.setState({
                 storedQuestions: newArray
             })
@@ -55,6 +61,28 @@ class Quiz extends Component {
                 btnDisabled: true,
             })
         }
+
+        if (this.props.userData.pseudo) {
+            this.showWelcomeMsg(this.props.userData.pseudo);
+        }
+
+    }
+
+    showWelcomeMsg = pseudo => {
+        if (!this.state.showWelcomeMsg) {
+            this.setState({
+                showWelcomeMsg: true,
+            })
+            toast.info(`Bienvnue ${pseudo}, bonne chance !`, {
+                position: "top-right",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+        }
     }
 
     submitAnswer = selectedAnswer => {
@@ -66,41 +94,74 @@ class Quiz extends Component {
 
     nextQuestion = () => {
         if (this.state.idQuestion === this.state.maxQuestions - 1) {
-            //End
+            console.log("Game over")
+            this.gameOver();
         } else {
             this.setState(prevState => ({
-              idQuestion: prevState.idQuestion + 1
+                idQuestion: prevState.idQuestion + 1
             }))
         }
 
         const goodAnswer = this.storedDataRed.current[this.state.idQuestion].answer;
 
-        if (this.state.userAnswer === goodAnswer)
+        if (this.state.userAnswer === goodAnswer) {
+            toast.success('+1 points !', {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                bodyClassName: "toastify-color",
+            });
             this.setState(prevState => ({
                 score: prevState.score + 1
             }));
+        } else {
+            toast.error('Mauvaise réponse !', {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                bodyClassName: "toastify-color",
+            });
+        }
+    }
+
+
+    gameOver() {
+        this.setState({
+            quizEnd: true,
+        })
     }
 
     render() {
         const displayOptions = this.state.options.map((option, index) => {
             return (
                 <p key={index} className={`answerOptions ${this.state.userAnswer === option && 'selected'}`}
-                onClick={() => this.submitAnswer(option)}>{option}</p>
+                   onClick={() => this.submitAnswer(option)}>{option}</p>
             )
-        } )
+        })
 
-        return (
-            <div>
+        return !this.state.quizEnd ?
+            <QuizOver ref={this.storedDataRed}/>
+            :
+            <Fragment>
                 <Levels/>
-                <ProgressBar/>
+                <ProgressBar idQuestion={this.state.idQuestion} maxQuestions={this.state.maxQuestions}/>
                 <h2>{this.state.question}</h2>
-                { displayOptions }
+                {displayOptions}
                 <button disabled={this.state.btnDisabled}
                         className={"btnSubmit"}
-                        onClick={this.nextQuestion}
-                >Suivant</button>
-            </div>
-        )
+                        onClick={this.nextQuestion}>
+                    {this.state.idQuestion < this.state.maxQuestions - 1 ?
+                        'Suivant' : 'Terminer'}
+                </button>
+            </Fragment>
     }
 }
 
