@@ -4,13 +4,19 @@ const QuizOver = React.forwardRef((props, ref) => {
 
     const [asked, setAsked] = useState([]);
 
-    const {levelNames, score, maxQuestions, quizLevel, percent} = props;
+    const {levelNames, score, maxQuestions, quizLevel, percent, loadLevelQuestions} = props;
 
     useEffect(() => {
         setAsked(ref.current);
     }, [ref])
 
     const averageGrade = maxQuestions / 2;
+
+    if (score < averageGrade) {
+        setTimeout(() => {
+            loadLevelQuestions(quizLevel);
+        }, 3000);
+    }
 
     const questionAnswer = score >= averageGrade ? (
         asked.map(question => {
@@ -27,6 +33,7 @@ const QuizOver = React.forwardRef((props, ref) => {
     ) : (
             <tr>
                 <td colSpan={"3"}>
+                    <div className={"loader"}/>
                     <p style={{textAlign: 'center', color: 'red'}}>
                         Pas de réponses !
                     </p>
@@ -40,13 +47,13 @@ const QuizOver = React.forwardRef((props, ref) => {
                     quizLevel < levelNames.length ? (
                         <Fragment>
                             <p className={"successMsg"}>Bravo, passez au nouveau suivant</p>
-                            <button className={"btnResult success"}>Niveau suivant</button>
+                            <button className={"btnResult success"} onClick={() => loadLevelQuestions(quizLevel)}>Niveau suivant</button>
                         </Fragment>
                     ) : (
                         <Fragment>
                             <div className={"stepsBtnContainer"}>
                                 <p className={"successMsg"}>Bravo, vous êtes un expert !</p>
-                                <button className={"btnResult gameOver"}>Niveau suivant</button>
+                                <button className={"btnResult gameOver"} onClick={() => loadLevelQuestions(0)}>Accueil</button>
                             </div>
                         </Fragment>
                     )
