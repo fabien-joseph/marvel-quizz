@@ -4,31 +4,75 @@ const QuizOver = React.forwardRef((props, ref) => {
 
     const [asked, setAsked] = useState([]);
 
+    const {levelNames, score, maxQuestions, quizLevel, percent} = props;
+
     useEffect(() => {
         setAsked(ref.current);
     }, [ref])
 
-    const questionAnswer = asked.map( question => {
-        return (
-            <tr key={question.id}>
-                <td>{question.question}</td>
-                <td>{question.answer}</td>
-                <td><button className={"btnInfo"}>Infos</button></td>
+    const averageGrade = maxQuestions / 2;
+
+    const questionAnswer = score >= averageGrade ? (
+        asked.map(question => {
+            return (
+                <tr key={question.id}>
+                    <td>{question.question}</td>
+                    <td>{question.answer}</td>
+                    <td>
+                        <button className={"btnInfo"}>Infos</button>
+                    </td>
+                </tr>
+            )
+        })
+    ) : (
+            <tr>
+                <td colSpan={"3"}>
+                    <p style={{textAlign: 'center', color: 'red'}}>
+                        Pas de réponses !
+                    </p>
+                </td>
             </tr>
-        )
-    })
+    )
+    const decision = score >= averageGrade ? (
+        <Fragment>
+            <div className={'stepsBtnContainer'}>
+                {
+                    quizLevel < levelNames.length ? (
+                        <Fragment>
+                            <p className={"successMsg"}>Bravo, passez au nouveau suivant</p>
+                            <button className={"btnResult success"}>Niveau suivant</button>
+                        </Fragment>
+                    ) : (
+                        <Fragment>
+                            <div className={"stepsBtnContainer"}>
+                                <p className={"successMsg"}>Bravo, vous êtes un expert !</p>
+                                <button className={"btnResult gameOver"}>Niveau suivant</button>
+                            </div>
+                        </Fragment>
+                    )
+                }
+            </div>
+            <div className={"percentage"}>
+                <div className={"progressPercent"}>Réussite: {percent}%</div>
+                <div className={"progressPercent"}>Note: {score}/{maxQuestions}</div>
+            </div>
+        </Fragment>
+    ) : (
+        <Fragment>
+            <div className={'stepsBtnContainer'}>
+                <p className={"failureMsg"}>Vous avez échoué</p>
+            </div>
+
+            <div className={"percentage"}>
+                <div className={"progressPercent"}>Réussite: {percent}%</div>
+                <div className={"progressPercent"}>Note: {score}/{maxQuestions}</div>
+            </div>
+        </Fragment>
+    )
 
     return (
         <Fragment>
-            <div className={"stepsBtnContainer"}>
-                <p className={"successMsg"}>Bravo, vous êtes un expert !</p>
-                <button className={"btnResult success"}>Niveau suivant</button>
-            </div>
-            <div className={"percentage"}>
-                <div className={"progressPercent"}>Réussite: 10%</div>
-                <div className={"progressPercent"}>Note: 10/10</div>
-            </div>
-
+            {decision}
             <hr/>
             <p>Les réponses aux questions posées :</p>
 

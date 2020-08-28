@@ -11,7 +11,7 @@ toast.configure();
 class Quiz extends Component {
 
     state = {
-        levelName: ["debutant", "confirme", "expert"],
+        levelNames: ["debutant", "confirme", "expert"],
         quizLevel: 0,
         maxQuestions: 10,
         storedQuestions: [],
@@ -41,7 +41,7 @@ class Quiz extends Component {
     }
 
     componentDidMount() {
-        this.loadQuestions(this.state.levelName[this.state.quizLevel]);
+        this.loadQuestions(this.state.levelNames[this.state.quizLevel]);
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -132,11 +132,23 @@ class Quiz extends Component {
         }
     }
 
+    getPercent = (maxQuest, ourScore) => (ourScore / maxQuest) * 100;
 
     gameOver() {
-        this.setState({
-            quizEnd: true,
-        })
+        const gradePercent = this.getPercent(this.state.maxQuestions, this.state.score);
+
+        if (gradePercent >= 50) {
+            this.setState({
+                quizLevel: this.state.quizLevel + 1,
+                percent: gradePercent,
+                quizEnd: true,
+            })
+        } else {
+            this.setState({
+                percent: gradePercent,
+                quizEnd: true
+            })
+        }
     }
 
     render() {
@@ -147,8 +159,14 @@ class Quiz extends Component {
             )
         })
 
-        return !this.state.quizEnd ?
-            <QuizOver ref={this.storedDataRed}/>
+        return this.state.quizEnd ?
+            <QuizOver ref={this.storedDataRed}
+                      levelNames={this.state.levelNames}
+                      score={this.state.score}
+                      maxQuestions={this.state.maxQuestions}
+                      quizLevel={this.state.quizLevel}
+                      percent={this.state.percent}
+            />
             :
             <Fragment>
                 <Levels/>
