@@ -1,4 +1,6 @@
 import React, {Fragment, useEffect, useState} from "react";
+import {GiTrophyCup} from "react-icons/gi";
+import {Loader} from "../Loader/Loader";
 
 const QuizOver = React.forwardRef((props, ref) => {
 
@@ -33,10 +35,7 @@ const QuizOver = React.forwardRef((props, ref) => {
     ) : (
             <tr>
                 <td colSpan={"3"}>
-                    <div className={"loader"}/>
-                    <p style={{textAlign: 'center', color: 'red'}}>
-                        Pas de réponses !
-                    </p>
+                    <Loader style={{textAlign: 'center', color: 'red'}} text={"Pas de réponse"}/>
                 </td>
             </tr>
     )
@@ -52,7 +51,7 @@ const QuizOver = React.forwardRef((props, ref) => {
                     ) : (
                         <Fragment>
                             <div className={"stepsBtnContainer"}>
-                                <p className={"successMsg"}>Bravo, vous êtes un expert !</p>
+                                <p className={"successMsg"}><GiTrophyCup size="50px"/> Bravo, vous êtes un expert !</p>
                                 <button className={"btnResult gameOver"} onClick={() => loadLevelQuestions(0)}>Accueil</button>
                             </div>
                         </Fragment>

@@ -5,37 +5,35 @@ import {QuizMarvel} from "../quizMarvel";
 import {toast} from "react-toastify";
 import 'react-toastify/dist/ReactToastify.min.css'
 import QuizOver from "../QuizOver";
+import { FaChevronRight } from 'react-icons/fa';
 
 toast.configure();
 
-class Quiz extends Component {
+const initialState = {
+    quizLevel: 0,
+    maxQuestions: 10,
+    storedQuestions: [],
+    question: null,
+    options: [],
+    idQuestion: 0,
+    btnDisabled: true,
+    userAnswer: null,
+    score: 0,
+    quizEnd: false,
+    percent: null,
+};
+
+const levelNames = ["debutant", "confirme", "expert"];
+
+    class Quiz extends Component {
+
 
     constructor(props) {
         super(props);
-        this.initialState = {
-            levelNames: ["debutant", "confirme", "expert"],
-            quizLevel: 0,
-            maxQuestions: 10,
-            storedQuestions: [],
-            question: null,
-            options: [],
-            idQuestion: 0,
-            btnDisabled: true,
-            userAnswer: null,
-            score: 0,
-            quizEnd: false,
-            percent: null,
-        }
-
-        this.state = this.initialState;
-
+        this.state = initialState;
         this.storedDataRed = React.createRef();
 
     }
-
-
-
-
 
     loadQuestions = level => {
         const fetchedArrayQuizz = QuizMarvel[0].quizz[level];
@@ -52,35 +50,43 @@ class Quiz extends Component {
     }
 
     componentDidMount() {
-        this.loadQuestions(this.state.levelNames[this.state.quizLevel]);
+        this.loadQuestions(levelNames[this.state.quizLevel]);
     }
 
-    componentDidUpdate(prevProps, prevState, snapshot) {
-        if ((this.state.storedQuestions !== prevState.storedQuestions) && this.state.storedQuestions.length) {
-            this.setState({
-                question: this.state.storedQuestions[this.state.idQuestion].question,
-                options: this.state.storedQuestions[this.state.idQuestion].options,
-            })
-        }
+        componentDidUpdate(prevProps, prevState, snapshot) {
+            const {
+                maxQuestions,
+                storedQuestions,
+                idQuestion,
+                score,
+                quizEnd,
+            } = this.state;
 
-        if ((this.state.idQuestion !== prevState.idQuestion) && this.state.storedQuestions.length) {
-            this.setState({
-                question: this.state.storedQuestions[this.state.idQuestion].question,
-                options: this.state.storedQuestions[this.state.idQuestion].options,
-                userAnswer: null,
-                btnDisabled: true,
-            })
-        }
+            if ((storedQuestions !== prevState.storedQuestions) && storedQuestions.length) {
+                this.setState({
+                    question: storedQuestions[idQuestion].question,
+                    options: storedQuestions[idQuestion].options,
+                })
+            }
 
-        if (this.state.quizEnd !== prevState.quizEnd) {
-            this.gameOver(this.getPercent(this.state.maxQuestions, this.state.score));
-        }
+            if ((idQuestion !== prevState.idQuestion) && storedQuestions.length) {
+                this.setState({
+                    question: storedQuestions[idQuestion].question,
+                    options: storedQuestions[idQuestion].options,
+                    userAnswer: null,
+                    btnDisabled: true,
+                })
+            }
 
-        if (this.props.userData.pseudo !== prevProps.userData.pseudo) {
-            this.showToastMsg(this.props.userData.pseudo);
-        }
+            if (quizEnd !== prevState.quizEnd) {
+                this.gameOver(this.getPercent(maxQuestions, score));
+            }
 
-    }
+            if (this.props.userData.pseudo !== prevProps.userData.pseudo) {
+                this.showToastMsg(this.props.userData.pseudo);
+            }
+
+        }
 
     showToastMsg = pseudo => {
         if (!this.state.showWelcomeMsg) {
@@ -165,40 +171,55 @@ class Quiz extends Component {
     }
 
     loadLevelQuestions = param => {
-        this.setState({...this.initialState, quizLevel: param})
-        this.loadQuestions(this.state.levelNames[param]);
+        this.setState({...initialState, quizLevel: param})
+        this.loadQuestions(levelNames[param]);
     }
 
     render() {
-        const displayOptions = this.state.options.map((option, index) => {
+        const {
+            quizLevel,
+            maxQuestions,
+            question,
+            options,
+            idQuestion,
+            btnDisabled,
+            userAnswer,
+            score,
+            percent
+        } = this.state;
+
+        const displayOptions = options.map((option, index) => {
             return (
-                <p key={index} className={`answerOptions ${this.state.userAnswer === option && 'selected'}`}
-                   onClick={() => this.submitAnswer(option)}>{option}</p>
+                <p key={index}
+                   className={`answerOptions ${userAnswer === option && 'selected'}`}
+                   onClick={() => this.submitAnswer(option)}>
+                    <FaChevronRight />{option}
+                </p>
             )
         })
 
         return this.state.quizEnd ?
             <QuizOver ref={this.storedDataRed}
-                      levelNames={this.state.levelNames}
-                      score={this.state.score}
-                      maxQuestions={this.state.maxQuestions}
-                      quizLevel={this.state.quizLevel}
-                      percent={this.state.percent}
+                      levelNames={levelNames}
+                      score={score}
+                      maxQuestions={maxQuestions}
+                      quizLevel={quizLevel}
+                      percent={percent}
                       loadLevelQuestions={this.loadLevelQuestions}
             />
             :
             <Fragment>
                 <Levels
-                levelNames={this.state.levelNames}
-                quizLevel={this.state.quizLevel}
+                levelNames={levelNames}
+                quizLevel={quizLevel}
                 />
-                <ProgressBar idQuestion={this.state.idQuestion} maxQuestions={this.state.maxQuestions}/>
-                <h2>{this.state.question}</h2>
+                <ProgressBar idQuestion={idQuestion} maxQuestions={maxQuestions}/>
+                <h2>{question}</h2>
                 {displayOptions}
-                <button disabled={this.state.btnDisabled}
+                <button disabled={btnDisabled}
                         className={"btnSubmit"}
                         onClick={this.nextQuestion}>
-                    {this.state.idQuestion < this.state.maxQuestions - 1 ?
+                    {idQuestion < maxQuestions - 1 ?
                         'Suivant' : 'Terminer'}
                 </button>
             </Fragment>
