@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 const Landing = () => {
     const [btn, setBtn] = useState(false);
     const refWolverine = useRef(null);
+    const test = process.env.REACT_APP_PROJECT_ID;
+    console.log(test);
 
     useEffect(() => {
         setBtn(true);
